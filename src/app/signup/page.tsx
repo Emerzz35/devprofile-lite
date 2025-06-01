@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Eye, EyeOff, CheckCircle } from "lucide-react"
-import { createUserWithEmailAndPassword, type FirebaseError } from "firebase/auth"
+import { createUserWithEmailAndPassword } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 
 export default function SignupPage() {
@@ -49,25 +49,32 @@ export default function SignupPage() {
       setTimeout(() => {
         router.push("/profile")
       }, 2000)
-    } catch (error) {
-      console.error("Erro no cadastro:", error)
-      setError(getErrorMessage(error as FirebaseError))
+    } catch (err: any) {
+      // Alterado para any
+      console.error("Erro no cadastro:", err)
+      setError(getErrorMessage(err))
     } finally {
       setLoading(false)
     }
   }
 
-  const getErrorMessage = (error: FirebaseError) => {
-    switch (error.code) {
-      case "auth/email-already-in-use":
-        return "Este email já está em uso"
-      case "auth/invalid-email":
-        return "Email inválido"
-      case "auth/weak-password":
-        return "Senha muito fraca"
-      default:
-        return "Erro ao criar conta. Tente novamente"
+  const getErrorMessage = (err: any) => {
+    // Alterado para any
+    // Verifica se o erro tem uma propriedade 'code' (comum em erros do Firebase)
+    if (err && err.code) {
+      switch (err.code) {
+        case "auth/email-already-in-use":
+          return "Este email já está em uso"
+        case "auth/invalid-email":
+          return "Email inválido"
+        case "auth/weak-password":
+          return "Senha muito fraca"
+        default:
+          return "Erro ao criar conta. Tente novamente"
+      }
     }
+    // Fallback para erros genéricos
+    return "Erro ao criar conta. Tente novamente"
   }
 
   if (success) {
