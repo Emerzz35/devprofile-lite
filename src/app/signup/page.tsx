@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Eye, EyeOff, CheckCircle } from "lucide-react"
-import { createUserWithEmailAndPassword } from "firebase/auth"
+import { createUserWithEmailAndPassword, type FirebaseError } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 
 export default function SignupPage() {
@@ -49,16 +49,16 @@ export default function SignupPage() {
       setTimeout(() => {
         router.push("/profile")
       }, 2000)
-    } catch (error: any) {
+    } catch (error) {
       console.error("Erro no cadastro:", error)
-      setError(getErrorMessage(error.code))
+      setError(getErrorMessage(error as FirebaseError))
     } finally {
       setLoading(false)
     }
   }
 
-  const getErrorMessage = (errorCode: string) => {
-    switch (errorCode) {
+  const getErrorMessage = (error: FirebaseError) => {
+    switch (error.code) {
       case "auth/email-already-in-use":
         return "Este email já está em uso"
       case "auth/invalid-email":

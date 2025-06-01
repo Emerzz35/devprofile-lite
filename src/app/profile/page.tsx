@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, User, FileText, ExternalLink, LogOut } from "lucide-react"
-import { onAuthStateChanged, signOut } from "firebase/auth"
+import { onAuthStateChanged, signOut, type User as FirebaseUser } from "firebase/auth"
 import { doc, getDoc } from "firebase/firestore"
 import { auth, db } from "@/lib/firebase"
 
@@ -17,7 +17,7 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<FirebaseUser | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -191,9 +191,9 @@ export default function ProfilePage() {
                   <strong>Campos:</strong>
                 </li>
                 <ul className="list-disc list-inside ml-4">
-                  <li>nomeCompleto: "Seu Nome Aqui"</li>
-                  <li>bioCurta: "Uma breve descrição sobre você"</li>
-                  <li>linkPortfolio: "http://seulink.com"</li>
+                  <li>nomeCompleto: &quot;Seu Nome Aqui&quot;</li>
+                  <li>bioCurta: &quot;Uma breve descrição sobre você&quot;</li>
+                  <li>linkPortfolio: &quot;http://seulink.com&quot;</li>
                 </ul>
               </ul>
             </div>

@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Eye, EyeOff } from "lucide-react"
-import { signInWithEmailAndPassword } from "firebase/auth"
+import { signInWithEmailAndPassword, type FirebaseError } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 
 export default function LoginPage() {
@@ -30,16 +30,16 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password)
       router.push("/profile")
-    } catch (error: any) {
+    } catch (error) {
       console.error("Erro no login:", error)
-      setError(getErrorMessage(error.code))
+      setError(getErrorMessage(error as FirebaseError))
     } finally {
       setLoading(false)
     }
   }
 
-  const getErrorMessage = (errorCode: string) => {
-    switch (errorCode) {
+  const getErrorMessage = (error: FirebaseError) => {
+    switch (error.code) {
       case "auth/user-not-found":
         return "Usuário não encontrado"
       case "auth/wrong-password":
