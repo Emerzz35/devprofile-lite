@@ -14,6 +14,12 @@ import { Loader2, Eye, EyeOff } from "lucide-react"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 
+// Definindo um tipo para a estrutura esperada do erro do Firebase
+interface FirebaseErrorLike {
+  code?: string
+  message?: string
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -30,18 +36,18 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password)
       router.push("/profile")
-    } catch (err: any) {
-      // Alterado para any
-      console.error("Erro no login:", err)
-      setError(getErrorMessage(err))
+    } catch (err) {
+      // Usando o tipo FirebaseErrorLike
+      const firebaseError = err as FirebaseErrorLike
+      console.error("Erro no login:", firebaseError)
+      setError(getErrorMessage(firebaseError))
     } finally {
       setLoading(false)
     }
   }
 
-  const getErrorMessage = (err: any) => {
-    // Alterado para any
-    // Verifica se o erro tem uma propriedade 'code' (comum em erros do Firebase)
+  const getErrorMessage = (err: FirebaseErrorLike) => {
+    // Usando o tipo FirebaseErrorLike
     if (err && err.code) {
       switch (err.code) {
         case "auth/user-not-found":
@@ -53,11 +59,10 @@ export default function LoginPage() {
         case "auth/too-many-requests":
           return "Muitas tentativas. Tente novamente mais tarde"
         default:
-          return "Erro ao fazer login. Tente novamente"
+          return err.message || "Erro ao fazer login. Tente novamente"
       }
     }
-    // Fallback para erros genéricos
-    return "Erro ao fazer login. Tente novamente"
+    return err.message || "Erro ao fazer login. Tente novamente"
   }
 
   return (

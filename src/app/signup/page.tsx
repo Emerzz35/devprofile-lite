@@ -14,6 +14,12 @@ import { Loader2, Eye, EyeOff, CheckCircle } from "lucide-react"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 
+// Definindo um tipo para a estrutura esperada do erro do Firebase
+interface FirebaseErrorLike {
+  code?: string
+  message?: string
+}
+
 export default function SignupPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -49,18 +55,18 @@ export default function SignupPage() {
       setTimeout(() => {
         router.push("/profile")
       }, 2000)
-    } catch (err: any) {
-      // Alterado para any
-      console.error("Erro no cadastro:", err)
-      setError(getErrorMessage(err))
+    } catch (err) {
+      // Usando o tipo FirebaseErrorLike
+      const firebaseError = err as FirebaseErrorLike
+      console.error("Erro no cadastro:", firebaseError)
+      setError(getErrorMessage(firebaseError))
     } finally {
       setLoading(false)
     }
   }
 
-  const getErrorMessage = (err: any) => {
-    // Alterado para any
-    // Verifica se o erro tem uma propriedade 'code' (comum em erros do Firebase)
+  const getErrorMessage = (err: FirebaseErrorLike) => {
+    // Usando o tipo FirebaseErrorLike
     if (err && err.code) {
       switch (err.code) {
         case "auth/email-already-in-use":
@@ -70,11 +76,10 @@ export default function SignupPage() {
         case "auth/weak-password":
           return "Senha muito fraca"
         default:
-          return "Erro ao criar conta. Tente novamente"
+          return err.message || "Erro ao criar conta. Tente novamente"
       }
     }
-    // Fallback para erros genéricos
-    return "Erro ao criar conta. Tente novamente"
+    return err.message || "Erro ao criar conta. Tente novamente"
   }
 
   if (success) {
